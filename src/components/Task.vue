@@ -16,20 +16,20 @@
                     <i class="fa fa-edit"></i> Edit 
                 </slot> Task
             </v-card-title>
-            <v-form>
+            <v-form name="form">
                 <v-container>
-                    <v-menu>
+                    <v-text-field v-if="showTitle" v-model="inputTitle" @update:model-value="title=inputTitle" type="input" 
+                        label="Title" variant="outlined"
+                        :model-value="title"
+                        :error-messages="errState[0]"
+                        ></v-text-field>
+                    <v-text-field type="input" v-model="inputDescription" @update:model-value="description=inputDescription" 
+                        :model-value="description" 
+                        :error-messages="errState[1]"
+                        label="Description" variant="outlined"
+                        ></v-text-field>
+                    <v-menu v-model="menu" :close-on-content-click="false">
                         <template v-slot:activator="{ props: activatorProps }">
-                            <v-text-field v-if="showTitle" v-model="inputTitle" @update:model-value="title=inputTitle" type="input" 
-                                label="Title" variant="outlined"
-                                :model-value="title"
-                                :error-messages="errState[0]"
-                                ></v-text-field>
-                            <v-text-field type="input" v-model="inputDescription" @update:model-value="description=inputDescription" 
-                                :model-value="description" 
-                                :error-messages="errState[1]"
-                                label="Description" variant="outlined"
-                                ></v-text-field>
                             <v-text-field
                                 :model-value="deadline"
                                 label="Deadline"
@@ -43,7 +43,7 @@
                                 </template>
                             </v-text-field>
                         </template>
-                    <v-date-picker v-model="date" @update:model-value="deadline=parseDate(date)"></v-date-picker>
+                    <v-date-picker v-model="date" @update:model-value="deadline=parseDate(date); menu=false;"></v-date-picker>
                     </v-menu>
 
                     <v-radio-group label="Priority" v-model="inputPriority" @update:model-value="priority=inputPriority" 
@@ -58,10 +58,15 @@
             </v-form>
             <template v-slot:actions>
                 <v-spacer></v-spacer>
-                <v-btn class="bg-blue" @click="if(checkValidate(title, description, deadline, priority, item_number, errState)){isActive.value=false;}">
+                <v-btn class="bg-blue" @click="if(checkValidate(title, description, deadline, priority, item_number, errState)){isActive.value=false; title=empty; description=empty; deadline=empty; priority=empty;}">
                     <slot></slot>
                 </v-btn>
-                <v-btn class="bg-red ml-0 mr-3" @click="isActive.value = false">
+                <v-btn class="bg-red ml-0 mr-3" @click="if(showTitle){title=empty; description=empty; deadline=empty; priority=empty;} 
+                errState[0] = false;
+                errState[1] = false;
+                errState[2] = false;
+                errState[3] = false;
+                isActive.value = false;">
                     <i class="fa fa-ban"></i> Cancel
                 </v-btn>
             </template>
@@ -94,9 +99,11 @@ import { ref } from 'vue'
         const inputDeadline = ref('')
         const inputPriority = ref('')
         const errState = ref([false, false, false, false])
+        const empty = ""
+        const menu = ref(false)
     return {
         // inputTitle, inputDescription, inputDeadline, inputPriority
-        errState
+        errState, empty, menu
     }
   },
     methods: {
@@ -133,13 +140,13 @@ import { ref } from 'vue'
                     errState[3] = "Priority is Required!";
                 else 
                     errState[3] = false;
+
                 return false;
             }
         },
         parseDate(date){
             return moment(date).format('MM/DD/YYYY');
-        },
-        reset(){return;}
+        }
     }
 }
 </script>
