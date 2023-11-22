@@ -9,8 +9,11 @@ import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import 'vuetify/dist/vuetify.min.css'
+
 import moment from 'moment';
 
+import ToastPlugin from 'vue-toast-notification';
+import 'vue-toast-notification/dist/theme-bootstrap.css';
 const app = createApp(App);
 
 const vuetify = createVuetify({
@@ -22,5 +25,6 @@ const vuetify = createVuetify({
         sets: {mdi},
     },
 });
-app.use(require('moment'));
-app.use(vuetify).mount('#app');
+app.use(vuetify);
+app.use(ToastPlugin);
+app.use(moment).mount('#app');

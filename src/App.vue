@@ -1,18 +1,21 @@
 <template>
-  <v-card>
-    <v-banner class="bg-primary">
-      <v-row>
-        <v-col>
-        <v-banner-text>
-          <i class="fa fa-bars"></i>&nbspFrameworks
-          <Task v-bind:getEntry="add" v-bind:showTitle="true">
-              <i class="fa fa-plus-circle"></i> Add
-          </Task>
-        </v-banner-text>
-      </v-col>
-    </v-row>
-    </v-banner>
+  <v-banner density="compact" bgColor="blue-darken-3" lines="one">
+    <template v-slot:default>
+      <v-container class="text-center" style="font-size: 24px; margin-left: 15%;">  
+        <i class="fa fa-bars">&nbspFRAMEWORKS</i>
+      </v-container>
+    </template>
+    <template v-slot:actions>
     <v-container>
+      <Task v-bind:getEntry="add" v-bind:showTitle="true" v-bind:uniqueTitle="uniqueTitle"
+      :title="String()" :description="String()" :deadline="String()" :priority="String()"
+      >
+          <i class="fa fa-plus-circle"></i> Add
+      </Task>
+    </v-container>
+    </template>
+  </v-banner>
+  <v-card class="bg-secondary">
         <v-table>
           <thead>
             <tr>
@@ -25,77 +28,72 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in items" :key="index">
-              <td class="text-center">{{ item.title }}</td>
-              <td class="text-center">{{ item.description }}</td>
-              <td class="text-center">{{ item.deadline }}</td>
-              <td class="text-center">{{ item.priority }}</td>
-              <td>
-                <v-checkbox color="blue" @click="item.check = !item.check;"></v-checkbox>
+            <tr v-for="(item, index) in items">
+              <td width="16%" class="text-center">{{ item.title }}</td>
+              <td width="16%" class="text-center">{{ item.description }}</td>
+              <td width="16%" class="text-center">{{ item.deadline }}</td>
+              <td width="17%" class="text-center">{{ item.priority }}</td>
+              <td width="17%">
+                  <v-checkbox-btn class="d-flex align-center" color="blue" @change="item.checked = !item.checked;"></v-checkbox-btn>
               </td>
-              <td>
-                <v-btn-group v-model="column" class="d-flex">
-                  <Task v-if="item.check" v-bind:getEntry="update" v-bind:showTitle="false">
-                    <i class="fa fa-edit"></i> Update
-                  </Task>
-                  <v-btn class="bg-red" v-bind="props" @click="remove()"><i class="fa fa-times-circle"></i>Delete</v-btn>
-                </v-btn-group>
+              <td width="16%">
+                <v-container class="d-flex align-center flex-column">
+                    <Task v-if="!item.checked" :getEntry="update" :showTitle="false" :item_number="index" :uniqueTitle="uniqueTitle"
+                      :title="item.title" :description="item.description" :deadline="item.deadline" :priority="item.priority"
+                    >
+                      <i class="fa fa-edit"></i> Update 
+                    </Task>
+                    <v-btn max-width="120" size="large" class="bg-red mt-0" v-bind="props" @click="remove(index)">
+                      <i class="fa fa-times-circle"></i> Delete
+                    </v-btn>
+                </v-container>
               </td>
             </tr>
           </tbody>
         </v-table>
-    </v-container>
+
   </v-card>
 </template>
 
 <script>
-import Entry from './components/Entry.vue'
 import Task from './components/Task.vue'
-import { ref } from 'vue'
-
-
 
 export default {
   name: 'App',
   components: {
-    Entry,
     Task
   },
   data() {
     return {
-      // items: [
-      // {
-      //   title: 'Title',
-      //   description: 'Desc',
-      //   deadline: 'Dead',
-      //   priority: 'Prio'
-      // },
-  //     {
-  //       title: 'Title',
-  //       description: 'Desc',
-  //       deadline: 'Dead',
-  //       priority: 'Prio'
-  //     }
-    // ]
+      items: [
+    ]
     };
   },
   setup() {
-    const added = ref(false)
-    const items = ref([{check: false}])
+    // const items = ref([])
     return {
-      added,
-      items
+      
     }
   },
   methods: {
     add(item) {
       this.items.push(item);
+      this.$toast.success('Task was added successfully!');
     },
     remove(i) {
       this.items.splice(i, 1);
+      this.$toast.success('Task was deleted successfully');
     },
     update(item, i) {
       this.items[i] = item; 
+      this.$toast.success('Task was updated successfully!');
+    },
+    uniqueTitle(title){
+      for (let i = 0; i < this.items.length; i++) {
+        if(title == this.items[i].title)
+          return false;
+      }
+      return true;
     }
   }
 }
